@@ -26,6 +26,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.jmballangca.pawprints.screens.main.appointments.components.AppointmentCard
+import com.jmballangca.pawprints.ui.custom.AppointmentCalendar
+import com.jmballangca.pawprints.ui.custom.PawPrintCalendarView
 import com.jmballangca.pawprints.ui.theme.PawPrintsTheme
 
 
@@ -74,7 +76,16 @@ fun AppointmentScreen(
                    )
                 }
             }
-            items(state.appointments) {
+            item {
+                AppointmentCalendar(
+                        isLoading = false,
+                    selectedDate = state.selectedDate,
+                    appointments = state.appointments,
+                    onMonthChange = {events.invoke(AppointmentEvents.OnSelectDate(it))},
+                    onDateSelected = {}
+                )
+            }
+            items(state.filteredAppoints) {
                 AppointmentCard(
                     appointments = it
                 )

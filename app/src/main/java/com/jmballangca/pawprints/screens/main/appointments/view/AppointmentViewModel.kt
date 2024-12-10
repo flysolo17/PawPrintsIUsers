@@ -10,6 +10,10 @@ import com.jmballangca.pawprints.utils.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.threeten.bp.LocalDate
+import java.text.SimpleDateFormat
+import java.time.format.DateTimeFormatter
+import java.util.Calendar
 import javax.inject.Inject
 
 
@@ -23,7 +27,30 @@ class AppointmentViewModel @Inject constructor(
         when(e) {
             is AppointmentEvents.OnGetAllAppointments -> getAllAppointments(e.userID)
             is AppointmentEvents.OnSetUsers -> state  = state.copy(user = e.users)
+            is AppointmentEvents.OnSelectDate -> selectDate(e.date)
         }
+    }
+
+
+
+    private fun selectDate(date: LocalDate) {
+        val appointments = state.appointments
+        val formatter = SimpleDateFormat("MMM, dd yyyy") // Define the format for scheduleDate
+
+        val filtered = appointments.filter {
+            val schedDate = formatter.parse(it.scheduleDate)
+            val calendar = Calendar.getInstance()
+            if (schedDate != null) {
+                calendar.time = schedDate
+            }
+            val schedMonth = calendar.get(Calendar.MONTH) // Get the month from the parsed date
+
+            schedMonth == date.monthValue - 1 // Compare the month of the scheduleDate with the selected month (monthValue is 1-based)
+        }
+
+        state = state.copy(
+            filteredAppoints = filtered
+        )
     }
 
     private fun getAllAppointments(userID: String) {
@@ -41,7 +68,8 @@ class AppointmentViewModel @Inject constructor(
                     is UiState.Success -> state.copy(
                         isLoading = false,
                         errors = null,
-                        appointments = it.data
+                        appointments = it.data,
+                        filteredAppoints = it.data
                     )
                 }
             }
