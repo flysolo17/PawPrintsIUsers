@@ -69,11 +69,12 @@ class AppointmentViewModel @Inject constructor(
                         isLoading = false,
                         errors = null,
                         appointments = it.data,
-                        filteredAppoints = it.data
+
                     )
                 }
             }
             delay(1000)
+            events(AppointmentEvents.OnSelectDate(LocalDate.now()))
             state =state.copy(errors = null)
         }
     }
